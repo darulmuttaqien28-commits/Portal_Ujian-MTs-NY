@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Ujian Online & Generator MTs Nurul Yaqin</title>
+<style>
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;background:#eef3f0;padding:12px;color:#1e293b}
+.box{max-width:860px;margin:auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 18px rgba(11,110,79,.12);border:1px solid #d1e3d8}
+.top{background:linear-gradient(135deg,#08543c 0%,#0b6e4f 60%,#128761 100%);color:#fff;text-align:center;padding:20px 14px 16px;position:relative;border-bottom:3px solid #d4af37}
+.top h1{margin:0;font-size:21px;letter-spacing:.5px}
+.top p{margin:6px 0 0;font-size:13px;opacity:.92}
+
+/* Switch Mode Utama (Siswa Default / Guru) */
+.mode-switch{display:flex;justify-content:center;gap:8px;margin-top:14px;background:rgba(0,0,0,.18);padding:5px;border-radius:12px;max-width:380px;margin-left:auto;margin-right:auto}
+.mode-btn{flex:1;padding:9px 12px;border:0;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer;background:transparent;color:#e2e8f0;transition:.2s}
+.mode-btn.active{background:#fff;color:#08543c;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+
+.body{padding:18px}
+label{display:block;font-weight:800;font-size:13px;margin-top:12px;color:#1e293b}
+input,select,textarea{width:100%;padding:11px 12px;border:1.5px solid #cbd5e1;border-radius:10px;margin-top:5px;font-size:14px;transition:border-color .2s;background:#fff}
+input:focus,select:focus{outline:none;border-color:#0b6e4f;box-shadow:0 0 0 3px rgba(11,110,79,.12)}
+textarea{font-family:monospace;font-size:12px}
+.pass-wrap{position:relative}
+.pass-wrap input{padding-right:44px}
+.toggle-pass{position:absolute;right:10px;top:50%;transform:translateY(-42%);background:none;border:0;cursor:pointer;font-size:16px;color:#475569;padding:4px}
+
+.btn{width:100%;background:linear-gradient(135deg,#0b6e4f,#15803d);color:#fff;border:0;padding:15px;font-size:15px;font-weight:800;border-radius:12px;cursor:pointer;margin-top:16px;box-shadow:0 3px 10px rgba(21,128,61,.25)}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn2{width:100%;background:#0b6e4f;color:#fff;border:0;padding:13px;font-size:14px;font-weight:800;border-radius:10px;cursor:pointer;margin-top:10px}
+.btn2:disabled{opacity:.5;cursor:wait}
+.btn-outline{background:#fff;color:#0b6e4f;border:2px solid #0b6e4f;padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer;font-size:13px}
+.btn-gold{background:linear-gradient(135deg,#b8961f,#d4af37);color:#fff;border:0;padding:11px 16px;border-radius:10px;font-weight:800;cursor:pointer;font-size:13px}
+.btn-red{background:#dc2626;color:#fff;border:0;padding:9px 14px;border-radius:10px;font-weight:800;cursor:pointer;font-size:13px}
+
+.info{background:#f0fdf4;border:1px solid #bbf7d0;padding:12px;border-radius:10px;font-size:13px;line-height:1.6}
+.warn{background:#fef3c7;border:1px solid #f59e0b;padding:10px;border-radius:10px;font-size:13px;line-height:1.5}
+.err{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:10px;border-radius:10px;display:none;margin-top:10px;font-weight:700;font-size:13px}
+.row{display:flex;gap:12px}.row>div{flex:1}
+.card{border:1.5px solid #e2e8f0;border-radius:12px;padding:14px;margin-top:12px;background:#f8fafc}
+.pill{display:inline-block;background:#e8f0fe;color:#1a73e8;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;margin:2px}
+
+/* Sub-tab Guru */
+.guru-tabs{display:flex;gap:8px;margin:14px 0;border-bottom:2px solid #e2e8f0;padding-bottom:10px}
+.gtab-btn{flex:1;padding:11px;border:1.5px solid #cbd5e1;background:#f8fafc;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;color:#334155}
+.gtab-btn.active{background:#0b6e4f;color:#fff;border-color:#0b6e4f}
+
+/* Kop Preview */
+.kop-preview{background:#fffdf5;border:1px solid #e8dfc0;border-radius:12px;padding:12px;text-align:center;margin-top:12px}
+.kop-preview .l1{font-size:17px;font-weight:900;color:#0a4d38}.kop-preview .l1 span{color:#b8961f}
+.kop-preview .l2{display:inline-block;background:#0b6e4f;color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:800;margin-top:6px}
+.kop-preview .l3{font-size:12px;font-weight:800;letter-spacing:2px;color:#0b6e4f;margin-top:5px}
+.kop-preview .l4{font-size:11px;color:#666;margin-top:3px}
+
+/* Ujian Siswa Styles */
+.soal-box{border:1.5px solid #cbd5e1;border-radius:12px;padding:15px;margin-top:12px;background:#fff}
+.soal-box img{max-width:100%;max-height:280px;border-radius:10px;margin:10px 0;display:block}
+.opt{display:flex;align-items:flex-start;gap:10px;margin:8px 0;background:#f8fafc;border:1.5px solid #cbd5e1;padding:12px;border-radius:10px;cursor:pointer;transition:.15s;font-weight:normal}
+.opt:hover{border-color:#0b6e4f;background:#f0fdf4}
+.opt input{width:18px;height:18px;margin-top:2px;flex-shrink:0}
+.nav-box{position:sticky;top:8px;z-index:20;background:#fff;border:2px solid #0b6e4f;border-radius:14px;padding:12px;margin:14px 0;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.nav-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.nav-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.nav-btn{width:36px;height:36px;border:1.5px solid #d1d5db;background:#f8fafc;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer}
+.nav-btn.sudah{background:#dcfce7;border-color:#16a34a;color:#166534}
+.nav-btn.belum{background:#fff}
+.nav-btn.aktif{background:#0b6e4f;color:#fff;border-color:#0b6e4f;transform:scale(1.08)}
+.nav-btn.ragu{background:#fef08a;border-color:#eab308}
+.progress{height:9px;background:#e5e7eb;border-radius:20px;overflow:hidden;margin-top:8px}
+.progress div{height:100%;background:#16a34a;transition:width .25s}
+.nav-ctrl{display:flex;gap:8px;margin-top:12px}
+.nav-ctrl button{flex:1;padding:12px;border:0;border-radius:10px;font-weight:800;cursor:pointer}
+.btn-prev{background:#e2e8f0;color:#1e293b}
+.btn-next{background:#0b6e4f;color:#fff}
+.btn-ragu{background:#facc15;color:#1e293b}
+.legend{font-size:11px;color:#64748b;margin-top:8px}
+.timer-bar{position:sticky;top:8px;z-index:25;background:#dc2626;color:#fff;text-align:center;padding:11px;font-weight:800;border-radius:10px;margin:14px 0;font-size:15px;box-shadow:0 3px 8px rgba(220,38,38,.25)}
+
+/* Tabel Rekap Nilai */
+.table-wrap{overflow-x:auto;margin-top:12px;border:1px solid #cbd5e1;border-radius:10px}
+table.rekap{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
+table.rekap th{background:#0b6e4f;color:#fff;padding:10px 8px;text-align:left;font-weight:800;white-space:nowrap}
+table.rekap td{padding:9px 8px;border-bottom:1px solid #e2e8f0}
+table.rekap tr:nth-child(even){background:#f8fafc}
+.badge-lulus{background:#dcfce7;color:#166534;padding:3px 8px;border-radius:12px;font-weight:800;font-size:11px}
+.badge-remidi{background:#fee2e2;color:#991b1b;padding:3px 8px;border-radius:12px;font-weight:800;font-size:11px}
+
+/* Hiasan Islami */
+.islamic-card{margin-top:18px;background:radial-gradient(circle at top right,#fefce8 0%,#f0fdf4 65%,#e6f4ea 100%);border:2px solid #c5a028;border-radius:14px;padding:16px 18px;box-shadow:inset 0 0 0 3px #fff, 0 3px 12px rgba(11,110,79,.08);text-align:center}
+.islamic-divider{display:flex;align-items:center;justify-content:center;gap:10px;color:#b8961f;font-size:14px;margin-bottom:8px}
+.islamic-divider::before,.islamic-divider::after{content:"";flex:1;height:1.5px;background:linear-gradient(90deg,transparent,#c5a028,transparent)}
+.bismillah{font-family:"Traditional Arabic","Amiri",Georgia,serif;font-size:21px;color:#08543c;font-weight:700;margin-bottom:6px}
+.hadits-arab{font-family:"Traditional Arabic","Amiri",Georgia,serif;font-size:20px;line-height:1.8;color:#0a4d38;margin:8px 0 6px;direction:rtl}
+.hadits-arti{font-size:13px;font-style:italic;color:#1e3a2f;line-height:1.6;margin:0}
+.hadits-perawi{display:inline-block;margin-top:6px;font-size:11.5px;font-weight:800;color:#92700c;background:#fef9c3;border:1px solid #fde047;padding:2px 10px;border-radius:20px}
+.bijak-box{margin-top:12px;padding-top:10px;border-top:1px dashed #c5a028;font-size:12.5px;color:#334155;line-height:1.55}
+.bijak-box b{color:#0b6e4f}
+
+@media(max-width:600px){.row{flex-direction:column}.guru-tabs{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="top">
+    <h1>PORTAL UJIAN MTs NURUL YAQIN</h1>
+    <p>YAYASAN PENDIDIKAN NURUL YAQIN TANJUNG ATAP &bull; UAS GAZAL 2026-2027</p>
+    <div class="mode-switch">
+      <button type="button" class="mode-btn active" id="btnModeSiswa" onclick="switchMode('siswa')">&#127891; MODE SISWA</button>
+      <button type="button" class="mode-btn" id="btnModeGuru" onclick="switchMode('guru')">&#128104;&#8205;&#127979; MODE GURU</button>
+    </div>
+    <div style="margin-top:10px" id="pillBox"></div>
+  </div>
+
+  <div class="body">
+    <!-- ==================== MODE SISWA (DEFAULT) ==================== -->
+    <div id="siswaSection">
+      <div id="siswaSetup">
+        <div class="info">
+          <b>Petunjuk Ujian Online Siswa:</b><br>
+          1. Isi identitas diri (Nama Lengkap, Kelas, dan Nomor Ujian/NIS).<br>
+          2. Pilih <b>Mata Pelajaran</b> yang sedang diujikan. Sistem otomatis mengambil soal sesuai tingkat kelas Anda.<br>
+          3. Klik <b>MULAI MENGERJAKAN UJIAN</b>. Waktu pengerjaan adalah <b>60 menit</b>.
+        </div>
+
+        <label>Nama Lengkap Siswa *</label>
+        <input id="sNama" placeholder="Contoh: Ahmad Fauzi">
+
+        <div class="row">
+          <div>
+            <label>Kelas Siswa *</label>
+            <select id="sKelas" onchange="onSiswaFilterChange()">
+              <option value="7.1">Kelas 7.1</option>
+              <option value="7.2">Kelas 7.2</option>
+              <option value="8.1">Kelas 8.1</option>
+              <option value="8.2">Kelas 8.2</option>
+              <option value="9">Kelas 9</option>
+            </select>
+          </div>
+          <div>
+            <label>Nomor Ujian / NIS *</label>
+            <input id="sNoUjian" placeholder="Contoh: 15">
+          </div>
+        </div>
+
+        <label>Mata Pelajaran Ujian *</label>
+        <select id="sMapel" onchange="onSiswaFilterChange()"></select>
+
+        <div id="sInfoTarget" class="warn" style="margin-top:12px"></div>
+        <div id="sErr" class="err"></div>
+
+        <button class="btn" id="btnMulaiSiswa" onclick="mulaiUjianSiswa()">MULAI MENGERJAKAN UJIAN</button>
+
+        <div class="islamic-card">
+          <div class="bismillah">&#1576;&#1616;&#1587;&#1618;&#1605;&#1616; &#1575;&#1604;&#1604;&#1617;&#1607;&#1616; &#1575;&#1604;&#1585;&#1617;&#1614;&#1581;&#1618;&#1605;&#1648;&#1606;&#1616; &#1575;&#1604;&#1585;&#1617;&#1614;&#1581;&#1616;&#1610;&#1618;&#1605;&#1616;</div>
+          <div class="islamic-divider">&#10022; &#9770; &#10022;</div>
+          <p class="hadits-arti">
+            &ldquo;Barang siapa yang menipu (berbuat curang), maka ia tidak termasuk golongan kami.&rdquo;
+          </p>
+          <span class="hadits-perawi">HR. Muslim No. 101</span>
+          <div class="bijak-box">
+            <b>Pesan Kejujuran:</b> Kerjakan ujian dengan jujur dan percaya diri. Hasil terbaik lahir dari usaha sendiri yang diberkahi Allah SWT.
+          </div>
+        </div>
+      </div>
+
+      <!-- Area Mengerjakan Soal Siswa -->
+      <div id="siswaExam" style="display:none">
+        <div class="info" id="sHeaderUjian" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"></div>
+        <div class="timer-bar" id="sTimer">Sisa Waktu: 60:00</div>
+
+        <div class="nav-box">
+          <div class="nav-top">
+            <b>Navigasi Nomor Soal</b>
+            <span id="sProgressText" style="font-size:13px;font-weight:800;color:#0b6e4f">0 / 0 dijawab</span>
+          </div>
+          <div class="progress"><div id="sProgressBar" style="width:0%"></div></div>
+          <div class="nav-grid" id="sNavGrid"></div>
+          <div class="legend">Hijau = Sudah Dijawab &bull; Putih = Belum &bull; Kuning = Ragu-ragu &bull; Hijau Tua = Aktif</div>
+        </div>
+
+        <div id="sSoalBox"></div>
+
+        <div class="nav-ctrl">
+          <button type="button" class="btn-prev" onclick="sPrevSoal()">&larr; Sebelumnya</button>
+          <button type="button" class="btn-ragu" onclick="sTandaiRagu()">Ragu-ragu</button>
+          <button type="button" class="btn-next" onclick="sNextSoal()">Berikutnya &rarr;</button>
+        </div>
+
+        <button type="button" class="btn" id="sBtnKirim" onclick="sKirimJawaban(false)">KIRIM JAWABAN &amp; LIHAT NILAI</button>
+      </div>
+
+      <!-- Area Hasil Siswa -->
+      <div id="siswaResult" style="display:none;margin-top:14px"></div>
+    </div>
+
+    <!-- ==================== MODE GURU ==================== -->
+    <div id="guruSection" style="display:none">
+      <!-- Login Guru -->
+      <div id="loginBox">
+        <div class="info"><b>Portal Guru MTs Nurul Yaqin:</b> Silakan pilih akun guru dan masukkan kata sandi pribadi Anda untuk menyusun naskah ujian atau melihat rekap nilai siswa.</div>
+        <label>Pilih Guru Pengampu *</label>
+        <select id="guruLogin"></select>
+        <label>Kata Sandi (Password) *</label>
+        <div class="pass-wrap">
+          <input id="passLogin" type="password" placeholder="Masukkan kata sandi Anda" onkeydown="if(event.key==='Enter')login()">
+          <button type="button" class="toggle-pass" onclick="togglePass()" title="Lihat/Sembunyikan Sandi">&#128065;</button>
+        </div>
+        <button class="btn" onclick="login()">MASUK KE PORTAL GURU</button>
+        <div id="errLogin" class="err"></div>
+
+        <div class="islamic-card">
+          <div class="bismillah">&#1576;&#1616;&#1587;&#1618;&#1605;&#1616; &#1575;&#1604;&#1604;&#1617;&#1607;&#1616; &#1575;&#1604;&#1585;&#1617;&#1614;&#1581;&#1618;&#1605;&#1648;&#1606;&#1616; &#1575;&#1604;&#1585;&#1617;&#1614;&#1581;&#1616;&#1610;&#1618;&#1605;&#1616;</div>
+          <div class="islamic-divider">&#10022; &#9770; &#10022;</div>
+          <div class="hadits-arab">
+            &#1605;&#1614;&#1606;&#1618; &#1587;&#1614;&#1604;&#1614;&#1603;&#1614; &#1591;&#1614;&#1585;&#1616;&#1610;&#1602;&#1611;&#1575; &#1610;&#1614;&#1604;&#1618;&#1578;&#1614;&#1605;&#1616;&#1587;&#1615; &#1601;&#1616;&#1610;&#1607;&#1616; &#1593;&#1616;&#1604;&#1618;&#1605;&#1611;&#1575; &#1587;&#1614;&#1607;&#1617;&#1614;&#1604;&#1614; &#1575;&#1604;&#1604;&#1617;&#1614;&#1607;&#1615; &#1604;&#1614;&#1607;&#1615; &#1576;&#1616;&#1607;&#1616; &#1591;&#1614;&#1585;&#1616;&#1610;&#1602;&#1611;&#1575; &#1573;&#1616;&#1604;&#1614;&#1609; &#1575;&#1604;&#1618;&#1580;&#1614;&#1606;&#1617;&#1614;&#1577;&#1616;
+          </div>
+          <p class="hadits-arti">
+            &ldquo;Barang siapa menempuh suatu jalan untuk menuntut ilmu, maka Allah akan memudahkan baginya jalan menuju surga.&rdquo;
+          </p>
+          <span class="hadits-perawi">HR. Muslim No. 2699</span>
+          <div class="bijak-box">
+            <b>Mutiara Hikmah:</b> &ldquo;Ilmu itu bukan yang dihafal, melainkan yang memberi manfaat. Mendidik satu generasi dengan kejujuran dan ilmu adalah amal jariyah yang tak pernah terputus.&rdquo; &mdash; <i>Imam Asy-Syafi&rsquo;i</i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Guru Setelah Login -->
+      <div id="mainBox" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap" class="info">
+          <div id="infoGuru"></div>
+          <button class="btn-red" onclick="logout()">KELUAR</button>
+        </div>
+
+        <div class="guru-tabs">
+          <button type="button" class="gtab-btn active" id="tabGenBtn" onclick="switchGuruTab('gen')">&#128221; GENERATOR FILE UJIAN</button>
+          <button type="button" class="gtab-btn" id="tabRekapBtn" onclick="switchGuruTab('rekap')">&#128202; REKAP NILAI &amp; EXPORT KOP</button>
+        </div>
+
+        <!-- TAB 1: GENERATOR FILE UJIAN -->
+        <div id="guruGenTab">
+          <div class="kop-preview">
+            <div class="l1">YAYASAN PENDIDIKAN <span>NURUL YAQIN</span></div>
+            <div><span class="l2">UJIAN AKHIR SEMESTER GAZAL (UAS) MTs</span></div>
+            <div class="l3">TAHUN PELAJARAN 2026-2027</div>
+            <div class="l4">Jl. Merdeka Km. 55 Tanjung Batu Ogan Ilir Sumatera Selatan 30664</div>
+          </div>
+
+          <label>Nama Guru Mapel (Otomatis dari Login)</label>
+          <input id="guru" readonly>
+          <label>Nama Kepala Madrasah *</label>
+          <input id="kepala" value="Dr. Istifada Rosyad, MM">
+
+          <div class="row">
+            <div>
+              <label>Mata Pelajaran * (Hanya Mapel Anda)</label>
+              <select id="mapel" onchange="resetBank('Mapel diganti')"></select>
+            </div>
+            <div>
+              <label>Kelas Guru * (Sesuai Penugasan)</label>
+              <select id="kelas" onchange="resetBank('Kelas diganti')"></select>
+            </div>
+          </div>
+
+          <div class="warn" id="infoKelasGuru" style="margin-top:8px"></div>
+
+          <label>Tahun Pelajaran</label>
+          <input id="tahun" value="2026 / 2027">
+          <label>URL Jembatan - 1 Bank Soal + 1 Rekap Nilai (Jangan diubah)</label>
+          <input id="url" value="https://script.google.com/macros/s/AKfycbzPH7kELfBdyBUiX2IVTqlwlkfwThIB66YgnysRPKaSge0TgWvG2C4WpIL0f8Vr6Yhq/exec" readonly style="background:#f0fdf4;font-size:12px">
+
+          <div class="row">
+            <div><label>Password Guru (Dikunci)</label><input id="pass" value="uas@2026" readonly style="background:#f0fdf4;font-weight:800"></div>
+            <div><label>KKM</label><input id="kkm" type="number" value="70"></div>
+          </div>
+
+          <div class="card">
+            <b>Bank Soal MTs - Otomatis dari 1 File Bank Soal (10 Kolom A-J)</b><br>
+            <span style="font-size:13px;color:#666">Soal dipastikan terfilter ketat berdasarkan Mapel &amp; Kelas Guru agar tidak pernah tercampur.</span><br>
+            <button class="btn2" id="btnAmbil" onclick="ambilBankSoal()">AMBIL BANK SOAL DARI SHEET</button>
+            <div id="cekBank" style="font-size:12px;color:#666;margin-top:8px">Belum diambil. Klik tombol di atas.</div>
+            <label style="margin-top:12px">Isi Bank Soal - Dikunci agar tidak tercampur (Otomatis reset jika Mapel/Kelas diganti)</label>
+            <textarea id="bank" rows="4" readonly placeholder="Soal akan muncul di sini setelah klik AMBIL BANK SOAL..."></textarea>
+          </div>
+
+          <button class="btn" id="btnBuat" onclick="buat()" disabled>BUAT FILE UJIAN BERWARNA - DOWNLOAD OTOMATIS</button>
+          <div id="hasil"></div>
+        </div>
+
+        <!-- TAB 2: REKAP NILAI SISWA & EXPORT KOP -->
+        <div id="guruRekapTab" style="display:none">
+          <div class="card" style="margin-top:0">
+            <b>Filter Rekap Nilai Siswa (Khusus Mapel &amp; Kelas Ampuan Anda)</b>
+            <div class="row">
+              <div>
+                <label>Mata Pelajaran</label>
+                <select id="rMapel" onchange="renderTabelRekap()"></select>
+              </div>
+              <div>
+                <label>Filter Kelas Siswa</label>
+                <select id="rKelasSiswa" onchange="renderTabelRekap()"></select>
+              </div>
+              <div>
+                <label>KKM Kelulusan</label>
+                <input id="rKkm" type="number" value="70" onchange="renderTabelRekap()">
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+              <button type="button" class="btn2" id="btnMuatRekap" style="flex:2;margin-top:0" onclick="muatRekapNilai()">&#128260; AMBIL / REFRESH DATA NILAI DARI SHEET</button>
+              <button type="button" class="btn-gold" style="flex:1" onclick="exportPrintKop()">&#128424; CETAK / PDF (PAKAI KOP)</button>
+              <button type="button" class="btn-outline" style="flex:1" onclick="exportExcelKop()">&#128196; EXPORT EXCEL (KOP)</button>
+            </div>
+            <div id="statusRekap" style="font-size:12.5px;color:#475569;margin-top:10px">Klik tombol ambil data nilai untuk memuat hasil ujian siswa.</div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="rekap">
+              <thead>
+                <tr>
+                  <th style="width:40px">No</th>
+                  <th>NIS / No Ujian</th>
+                  <th>Nama Siswa</th>
+                  <th>Kelas</th>
+                  <th>Mata Pelajaran</th>
+                  <th>Benar</th>
+                  <th>Nilai</th>
+                  <th>Keterangan</th>
+                  <th>Waktu Kirim</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyRekap">
+                <tr><td colspan="9" style="text-align:center;color:#64748b;padding:18px">Belum ada data dimuat.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BANK_SOAL_URL = "https://script.google.com/macros/s/AKfycbzPH7kELfBdyBUiX2IVTqlwlkfwThIB66YgnysRPKaSge0TgWvG2C4WpIL0f8Vr6Yhq/exec";
+
+// Konfigurasi Guru beserta Mapel dan Pembatasan Kelas Tingkat (7, 8, 9)
+const GURU = {
+  "Herwanah, S.Pd": { pass: "indo@2026", mapelMTs: ["Bahasa Indonesia"], kelasAllowed: ["7","8","9"] },
+  "Yuharman, S.Pd": { pass: "inggris@2026", mapelMTs: ["Bahasa Inggris"], kelasAllowed: ["7","8","9"] },
+  "Muallimin, S.PdI": { pass: "arab@2026", mapelMTs: ["Bahasa Arab","Al-Qur'an Hadits","Fiqih"], kelasAllowed: ["7","8","9"] },
+  "M. Rizal, S.Hum": { pass: "ski@2026", mapelMTs: ["SKI"], kelasAllowed: ["7","8","9"] },
+  "Drs. Soryanto": { pass: "ips@2026", mapelMTs: ["IPS"], kelasAllowed: ["7","8","9"] },
+  "Fathonah Izzatillah, S.Pd": { pass: "ipa@2026", mapelMTs: ["IPA"], kelasAllowed: ["7","8","9"] },
+  "Stevi Dwi Anggraini, S.Pd": { pass: "ppkn@2026", mapelMTs: ["PPKn","Akidah Akhlak"], kelasAllowed: ["7","8","9"] },
+  "Suaibatul Aslamiah, S.Pd": { pass: "seni@2026", mapelMTs: ["Seni Budaya"], kelasAllowed: ["7","8","9"] },
+  "Gunadi, S.Pd": { pass: "pjok@2026", mapelMTs: ["PJOK"], kelasAllowed: ["7","8","9"] },
+  "Lisdaini": { pass: "btq89@2026", mapelMTs: ["BTQ"], kelasAllowed: ["8","9"] },
+  "Ardini": { pass: "btq7@2026", mapelMTs: ["BTQ"], kelasAllowed: ["7"] }
+};
+
+const ALL_MAPEL_MTS = [
+  "Bahasa Indonesia", "Bahasa Inggris", "Bahasa Arab", "Al-Qur'an Hadits",
+  "Fiqih", "SKI", "IPS", "IPA", "PPKn", "Akidah Akhlak", "Seni Budaya", "PJOK", "BTQ"
+];
+
+const KELAS_SISWA = ["7.1","7.2","8.1","8.2","9"];
+const LOGO = {
+  kemenag: "https://drive.google.com/thumbnail?id=1sQAvuz03dOFJuGfpvuFFj603EXp_v9zp&sz=w1000",
+  sekolah: "https://drive.google.com/thumbnail?id=1-4GC_cF4mofh8pN_q-du-QRTuEBNZzHr&sz=w1000"
+};
+
+let GURU_AKTIF = "";
+let LAST_AMBIL = "";
+let FETCH_CONTROLLER = null;
+let SISWA_FETCH_CONTROLLER = null;
+let DATA_REKAP_RAW = [];
+
+// Inisialisasi Dropdown Login Guru & Dropdown Mapel Siswa
+document.getElementById("guruLogin").innerHTML =
+  `<option value="" disabled selected>-- Silakan Pilih Nama Guru --</option>` +
+  Object.keys(GURU).map(g => `<option value="${g}">${g}</option>`).join("");
+
+document.getElementById("sMapel").innerHTML =
+  ALL_MAPEL_MTS.map(m => `<option value="${m}">${m}</option>`).join("");
+
+function norm(str){
+  return String(str || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function getTingkatKelas(kelasSiswa){
+  const k = String(kelasSiswa || "").trim();
+  if(k.startsWith("7")) return "7";
+  if(k.startsWith("8")) return "8";
+  if(k.startsWith("9")) return "9";
+  return k;
+}
+
+function getGuruPengampuByMapelKelas(mapel, tingkatKelas){
+  for(const [namaGuru, cfg] of Object.entries(GURU)){
+    if(cfg.mapelMTs.includes(mapel) && cfg.kelasAllowed.includes(tingkatKelas)){
+      return namaGuru;
+    }
+  }
+  return "Guru Mapel MTs";
+}
+
+function fixGambar(url){
+  if(!url) return "";
+  url = url.trim();
+  if(!url) return "";
+  if(url.startsWith("gambar-")) return url;
+  let id = "";
+  let m = url.match(/[?&]id=([^&]+)/);
+  if(m) id = m[1];
+  if(!id){ let m2 = url.match(/\/d\/([^\/]+)/); if(m2) id = m2[1]; }
+  if(!id) return url;
+  return "https://drive.google.com/thumbnail?id=" + id + "&sz=w1000";
+}
+
+function switchMode(mode){
+  const isSiswa = mode === "siswa";
+  document.getElementById("siswaSection").style.display = isSiswa ? "block" : "none";
+  document.getElementById("guruSection").style.display = isSiswa ? "none" : "block";
+  document.getElementById("btnModeSiswa").classList.toggle("active", isSiswa);
+  document.getElementById("btnModeGuru").classList.toggle("active", !isSiswa);
+  if(isSiswa){
+    document.getElementById("pillBox").innerHTML = `<span class="pill" style="background:#fef3c7;color:#92400e">Mode Ujian Siswa Aktif</span>`;
+  } else if(GURU_AKTIF){
+    const cfg = GURU[GURU_AKTIF];
+    document.getElementById("pillBox").innerHTML =
+      cfg.mapelMTs.map(m => `<span class="pill">${m}</span>`).join("") +
+      `<span class="pill" style="background:#dcfce7;color:#166534">Kelas ${cfg.kelasAllowed.join(", ")}</span>`;
+  } else {
+    document.getElementById("pillBox").innerHTML = "";
+  }
+}
+
+/* ==================== LOGIKA MODE SISWA (DEFAULT) ==================== */
+let S_SOAL = [];
+let S_CURRENT = 0;
+let S_RAGU = new Set();
+let S_JAWABAN = [];
+let S_TIMER = null;
+let S_SISA_DETIK = 60 * 60;
+let S_META = {};
+
+function onSiswaFilterChange(){
+  const kSiswa = document.getElementById("sKelas").value;
+  const mapel = document.getElementById("sMapel").value;
+  const tingkat = getTingkatKelas(kSiswa);
+  const guruMapel = getGuruPengampuByMapelKelas(mapel, tingkat);
+  document.getElementById("sInfoTarget").innerHTML =
+    `Target Bank Soal: <b>${mapel}</b> &bull; Tingkat <b>Kelas ${tingkat}</b> (untuk Kelas ${kSiswa}) &bull; Guru Pengampu: <b>${guruMapel}</b>`;
+  document.getElementById("sErr").style.display = "none";
+}
+onSiswaFilterChange();
+
+async function mulaiUjianSiswa(){
+  const nama = document.getElementById("sNama").value.trim();
+  const kelasSiswa = document.getElementById("sKelas").value;
+  const noUjian = document.getElementById("sNoUjian").value.trim();
+  const mapel = document.getElementById("sMapel").value;
+  const tingkatKelas = getTingkatKelas(kelasSiswa);
+  const guruPengampu = getGuruPengampuByMapelKelas(mapel, tingkatKelas);
+  const errEl = document.getElementById("sErr");
+
+  if(!nama || !noUjian){
+    errEl.style.display = "block";
+    errEl.innerText = "Harap isi Nama Lengkap dan Nomor Ujian / NIS terlebih dahulu!";
+    return;
+  }
+  errEl.style.display = "none";
+
+  if(SISWA_FETCH_CONTROLLER) SISWA_FETCH_CONTROLLER.abort();
+  SISWA_FETCH_CONTROLLER = new AbortController();
+
+  const btn = document.getElementById("btnMulaiSiswa");
+  btn.disabled = true;
+  btn.innerText = `MEMUAT SOAL ${mapel.toUpperCase()} KELAS ${tingkatKelas}...`;
+
+  try{
+    const reqUrl = `${BANK_SOAL_URL}?mapel=${encodeURIComponent(mapel)}&kelas=${encodeURIComponent(tingkatKelas)}&kelasDasar=${encodeURIComponent(tingkatKelas)}&tab=${encodeURIComponent(mapel+"-"+tingkatKelas)}&guru=${encodeURIComponent(guruPengampu)}&_t=${Date.now()}`;
+    const res = await fetch(reqUrl, { signal: SISWA_FETCH_CONTROLLER.signal });
+    const data = await res.json();
+
+    if(data.error){
+      throw new Error(data.error);
+    }
+    if(data.mapel && norm(data.mapel) !== norm(mapel)){
+      throw new Error(`Keamanan Validasi: Server mengirim soal "${data.mapel}", bukan "${mapel}".`);
+    }
+
+    let daftarSoal = Array.isArray(data.soal) ? data.soal : [];
+    // Filter ketat anti-tercampur mapel maupun tingkat kelas
+    daftarSoal = daftarSoal.filter(s => {
+      if(s.mapel && norm(s.mapel) !== norm(mapel)) return false;
+      if(s.kelas && String(s.kelas).trim() !== "" && getTingkatKelas(s.kelas) !== tingkatKelas) return false;
+      return s.soal && String(s.soal).trim() !== "";
+    });
+
+    if(!daftarSoal.length){
+      throw new Error(`Soal untuk ${mapel} Kelas ${tingkatKelas} belum tersedia di Bank Soal.`);
+    }
+
+    let mapped = daftarSoal.map(s => {
+      let kh = String(s.kunci || "A").trim().toUpperCase();
+      let ki = ["A","B","C","D"].indexOf(kh);
+      if(ki < 0) ki = 0;
+      return {
+        q: String(s.soal || ""),
+        o: [String(s.a || ""), String(s.b || ""), String(s.c || ""), String(s.d || "")],
+        k: ki,
+        gambar: fixGambar(s.gambar || "")
+      };
+    });
+
+    // Acak urutan soal (Fisher-Yates) dan ambil maks 50 soal
+    for(let i = mapped.length - 1; i > 0; i--){
+      let j = Math.floor(Math.random() * (i + 1));
+      [mapped[i], mapped[j]] = [mapped[j], mapped[i]];
+    }
+    S_SOAL = mapped.slice(0, 50);
+    S_CURRENT = 0;
+    S_RAGU = new Set();
+    S_JAWABAN = new Array(S_SOAL.length).fill(-1);
+    S_SISA_DETIK = 60 * 60;
+    S_META = {
+      nama, kelasSiswa, noUjian, mapel, tingkatKelas, guruPengampu,
+      kkm: 70, url: BANK_SOAL_URL
+    };
+
+    document.getElementById("siswaSetup").style.display = "none";
+    document.getElementById("siswaResult").style.display = "none";
+    document.getElementById("siswaExam").style.display = "block";
+    document.getElementById("sHeaderUjian").innerHTML =
+      `<div><b>${nama}</b> (${kelasSiswa}) &bull; No: <b>${noUjian}</b></div>` +
+      `<div>Mapel: <b>${mapel}</b> (Kls ${tingkatKelas}) &bull; Guru: <b>${guruPengampu}</b></div>`;
+
+    sBuildNav();
+    sRenderSoal();
+    if(S_TIMER) clearInterval(S_TIMER);
+    S_TIMER = setInterval(() => {
+      S_SISA_DETIK--;
+      let m = Math.floor(S_SISA_DETIK / 60);
+      let d = S_SISA_DETIK % 60;
+      document.getElementById("sTimer").innerText = `Sisa Waktu: ${m}:${d < 10 ? "0" : ""}${d}`;
+      if(S_SISA_DETIK <= 0){
+        clearInterval(S_TIMER);
+        sKirimJawaban(true);
+      }
+    }, 1000);
+  } catch(e){
+    if(e.name === "AbortError") return;
+    errEl.style.display = "block";
+    errEl.innerText = "Gagal memuat ujian: " + (e.message || e);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "MULAI MENGERJAKAN UJIAN";
+    SISWA_FETCH_CONTROLLER = null;
+  }
+}
+
+function sBuildNav(){
+  document.getElementById("sNavGrid").innerHTML = S_SOAL.map((_, i) =>
+    `<button type="button" class="nav-btn" id="snav${i}" onclick="sGoSoal(${i})">${i+1}</button>`
+  ).join("");
+}
+
+function sPilihJawaban(idx, val){
+  S_JAWABAN[idx] = val;
+  sUpdateNav();
+}
+
+function sUpdateNav(){
+  let dijawab = 0;
+  S_SOAL.forEach((_, i) => {
+    let btn = document.getElementById("snav" + i);
+    if(!btn) return;
+    btn.classList.remove("sudah", "belum", "aktif", "ragu");
+    if(i === S_CURRENT) btn.classList.add("aktif");
+    else if(S_RAGU.has(i)) btn.classList.add("ragu");
+    else if(S_JAWABAN[i] >= 0) btn.classList.add("sudah");
+    else btn.classList.add("belum");
+    if(S_JAWABAN[i] >= 0) dijawab++;
+  });
+  document.getElementById("sProgressText").innerText = `${dijawab} / ${S_SOAL.length} dijawab`;
+  document.getElementById("sProgressBar").style.width = `${(dijawab / S_SOAL.length) * 100}%`;
+}
+
+function sRenderSoal(){
+  const s = S_SOAL[S_CURRENT];
+  let h = `<div class="soal-box"><b>${S_CURRENT + 1}. ${s.q}</b> <span style="font-size:12px;color:#64748b">(Soal ${S_CURRENT + 1} dari ${S_SOAL.length})</span><br>`;
+  if(s.gambar) h += `<img src="${s.gambar}" alt="Gambar Soal">`;
+  s.o.forEach((o, j) => {
+    let chk = S_JAWABAN[S_CURRENT] === j ? "checked" : "";
+    h += `<label class="opt"><input type="radio" name="sq${S_CURRENT}" value="${j}" ${chk} onchange="sPilihJawaban(${S_CURRENT},${j})"> <span><b>${String.fromCharCode(65+j)}.</b> ${o}</span></label>`;
+  });
+  h += `</div>`;
+  document.getElementById("sSoalBox").innerHTML = h;
+  sUpdateNav();
+}
+
+function sGoSoal(i){ S_CURRENT = i; sRenderSoal(); }
+function sNextSoal(){ if(S_CURRENT < S_SOAL.length - 1){ S_CURRENT++; sRenderSoal(); } }
+function sPrevSoal(){ if(S_CURRENT > 0){ S_CURRENT--; sRenderSoal(); } }
+function sTandaiRagu(){
+  if(S_RAGU.has(S_CURRENT)) S_RAGU.delete(S_CURRENT);
+  else S_RAGU.add(S_CURRENT);
+  sUpdateNav();
+}
+
+function simpanCadanganLokal(record){
+  try{
+    const key = "MTs_NY_REKAP_NILAI";
+    const existing = JSON.parse(localStorage.getItem(key) || "[]");
+    existing.unshift(record);
+    localStorage.setItem(key, JSON.stringify(existing.slice(0, 500)));
+  }catch(_){}
+}
+
+async function sKirimJawaban(auto){
+  const belumDijawab = S_JAWABAN.filter(v => v < 0).length;
+  if(!auto && belumDijawab > 0){
+    if(!confirm(`Masih ada ${belumDijawab} soal yang belum dijawab. Yakin ingin mengirim jawaban sekarang?`)) return;
+  }
+  if(S_TIMER) clearInterval(S_TIMER);
+  document.getElementById("sBtnKirim").disabled = true;
+
+  let benar = 0;
+  S_SOAL.forEach((s, i) => { if(S_JAWABAN[i] === s.k) benar++; });
+  let nilai = Math.round((benar / S_SOAL.length) * 100);
+  let waktuStr = new Date().toLocaleString("id-ID");
+
+  const payload = {
+    action: "simpanNilai",
+    nama: S_META.nama,
+    kelas: S_META.kelasSiswa,
+    nis: S_META.noUjian,
+    mapel: S_META.mapel,
+    kelasDasar: S_META.tingkatKelas,
+    nilai: nilai,
+    benar: benar,
+    totalSoal: S_SOAL.length,
+    jawaban: S_JAWABAN.map(v => v < 0 ? "-" : String.fromCharCode(65 + v)).join(","),
+    waktu: waktuStr,
+    ujian: `${S_META.mapel} Kelas ${S_META.tingkatKelas}`,
+    guru: S_META.guruPengampu
+  };
+
+  simpanCadanganLokal(payload);
+
+  document.getElementById("siswaExam").style.display = "none";
+  const resDiv = document.getElementById("siswaResult");
+  resDiv.style.display = "block";
+  resDiv.innerHTML = `
+    <div style="background:#ecfdf5;border:2px solid #10b981;border-radius:14px;padding:20px;text-align:center">
+      <div style="font-size:14px;font-weight:800;color:#065f46">HASIL UJIAN AKHIR SEMESTER GAZAL</div>
+      <h2 style="font-size:36px;margin:8px 0;color:#0b6e4f">Nilai: ${nilai}</h2>
+      <p style="font-size:14px;margin:6px 0">Benar <b>${benar}</b> dari <b>${S_SOAL.length}</b> soal &bull; Status: <b>${nilai >= S_META.kkm ? "LULUS (KKM 70)" : "BELUM LULUS (KKM 70)"}</b></p>
+      <p style="font-size:13px;color:#334155">Nama: <b>${S_META.nama}</b> | Kelas: <b>${S_META.kelasSiswa}</b> | No Ujian: <b>${S_META.noUjian}</b> | Mapel: <b>${S_META.mapel}</b></p>
+      <p id="sStatusKirim" style="font-size:13px;font-weight:700;color:#0b6e4f">Sedang mengirim nilai ke server madrasah...</p>
+      <button type="button" class="btn2" style="max-width:260px;margin:12px auto 0" onclick="kembaliAwalSiswa()">SELESAI / UJIAN MAPEL LAIN</button>
+    </div>
+  `;
+
+  try{
+    await fetch(S_META.url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    document.getElementById("sStatusKirim").innerHTML = `<span style="color:#15803d">&#10004; Nilai Berhasil Terkirim ke ${S_META.guruPengampu}. Silakan screenshot halaman ini sebagai bukti.</span>`;
+  }catch(e){
+    document.getElementById("sStatusKirim").innerHTML = `<span style="color:#dc2626">Gagal kirim otomatis ke jaringan. Screenshot layar ini dan kirim ke WA ${S_META.guruPengampu}.</span>`;
+  }
+}
+
+function kembaliAwalSiswa(){
+  document.getElementById("siswaResult").style.display = "none";
+  document.getElementById("siswaSetup").style.display = "block";
+  document.getElementById("sBtnKirim").disabled = false;
+}
+
+/* ==================== LOGIKA MODE GURU ==================== */
+function togglePass(){
+  const inp = document.getElementById("passLogin");
+  inp.type = inp.type === "password" ? "text" : "password";
+}
+
+function login(){
+  let g = document.getElementById("guruLogin").value;
+  let p = document.getElementById("passLogin").value.trim();
+  let err = document.getElementById("errLogin");
+  if(!g || !GURU[g]){
+    err.style.display = "block";
+    err.innerText = "Silakan pilih nama guru terlebih dahulu.";
+    return;
+  }
+  if(p !== GURU[g].pass){
+    err.style.display = "block";
+    err.innerText = "Kata sandi tidak sesuai. Silakan periksa kembali atau hubungi Admin.";
+    return;
+  }
+  err.style.display = "none";
+  GURU_AKTIF = g;
+  const cfg = GURU[g];
+
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("mainBox").style.display = "block";
+  document.getElementById("guru").value = g;
+  document.getElementById("infoGuru").innerHTML =
+    `Assalamu'alaikum, <b>${g}</b><br>MTs Nurul Yaqin &bull; Mapel: <b>${cfg.mapelMTs.join(", ")}</b> &bull; Kelas Ampuan: <b>Kelas ${cfg.kelasAllowed.join(" & ")}</b>`;
+
+  // Isi dropdown generator sesuai hak akses guru
+  document.getElementById("mapel").innerHTML = cfg.mapelMTs.map(m => `<option value="${m}">${m}</option>`).join("");
+  document.getElementById("kelas").innerHTML = cfg.kelasAllowed.map(k => `<option value="${k}">Kelas ${k}</option>`).join("");
+  document.getElementById("infoKelasGuru").innerHTML =
+    `Hak akses kelas Anda: <b>Kelas ${cfg.kelasAllowed.join(", ")}</b>. Soal dan rekap nilai otomatis dikunci hanya untuk mapel &amp; kelas tersebut.`;
+
+  // Isi dropdown rekap nilai sesuai hak akses guru
+  document.getElementById("rMapel").innerHTML = cfg.mapelMTs.map(m => `<option value="${m}">${m}</option>`).join("");
+  const allowedSiswaClasses = KELAS_SISWA.filter(ks => cfg.kelasAllowed.includes(getTingkatKelas(ks)));
+  document.getElementById("rKelasSiswa").innerHTML =
+    `<option value="ALL">Semua Kelas Ampuan (${allowedSiswaClasses.join(", ")})</option>` +
+    allowedSiswaClasses.map(ks => `<option value="${ks}">Kelas ${ks}</option>`).join("");
+
+  switchMode("guru");
+  switchGuruTab("gen");
+  resetBank("Siap");
+}
+
+function logout(){
+  if(FETCH_CONTROLLER){ FETCH_CONTROLLER.abort(); FETCH_CONTROLLER = null; }
+  GURU_AKTIF = ""; LAST_AMBIL = ""; DATA_REKAP_RAW = [];
+  document.getElementById("guruLogin").selectedIndex = 0;
+  document.getElementById("passLogin").value = "";
+  document.getElementById("passLogin").type = "password";
+  document.getElementById("pillBox").innerHTML = "";
+  document.getElementById("loginBox").style.display = "block";
+  document.getElementById("mainBox").style.display = "none";
+}
+
+function switchGuruTab(tab){
+  const isGen = tab === "gen";
+  document.getElementById("guruGenTab").style.display = isGen ? "block" : "none";
+  document.getElementById("guruRekapTab").style.display = isGen ? "none" : "block";
+  document.getElementById("tabGenBtn").classList.toggle("active", isGen);
+  document.getElementById("tabRekapBtn").classList.toggle("active", !isGen);
+  if(!isGen && DATA_REKAP_RAW.length === 0){
+    muatRekapNilai();
+  }
+}
+
+function resetBank(alasan){
+  if(FETCH_CONTROLLER){ FETCH_CONTROLLER.abort(); FETCH_CONTROLLER = null; }
+  let btnAmbil = document.getElementById("btnAmbil");
+  if(btnAmbil) btnAmbil.disabled = false;
+
+  document.getElementById("bank").value = "";
+  LAST_AMBIL = "";
+  document.getElementById("btnBuat").disabled = true;
+  let mapel = document.getElementById("mapel") ? document.getElementById("mapel").value : "";
+  let kelas = document.getElementById("kelas") ? document.getElementById("kelas").value : "";
+  document.getElementById("cekBank").innerHTML = `Soal lama dikosongkan (${alasan}). Target saat ini: Mapel <b>${mapel}</b> Kelas <b>${kelas}</b>. Klik AMBIL BANK SOAL.`;
+  document.getElementById("hasil").innerHTML = "";
+}
+
+async function ambilBankSoal(){
+  let mapel = document.getElementById("mapel").value.trim();
+  let kelas = document.getElementById("kelas").value.trim();
+  const cfg = GURU[GURU_AKTIF];
+
+  if(!cfg.mapelMTs.includes(mapel) || !cfg.kelasAllowed.includes(kelas)){
+    alert(`Anda tidak memiliki akses untuk ${mapel} Kelas ${kelas}!`);
+    return;
+  }
+
+  if(FETCH_CONTROLLER) FETCH_CONTROLLER.abort();
+  FETCH_CONTROLLER = new AbortController();
+  const signal = FETCH_CONTROLLER.signal;
+
+  let btnAmbil = document.getElementById("btnAmbil");
+  let btnBuat = document.getElementById("btnBuat");
+  btnAmbil.disabled = true;
+  btnBuat.disabled = true;
+  document.getElementById("bank").value = "";
+  LAST_AMBIL = "";
+  document.getElementById("cekBank").innerHTML = `Sedang mengambil khusus <b>${mapel}</b> Kelas <b>${kelas}</b>...`;
+
+  try{
+    const reqUrl = `${BANK_SOAL_URL}?mapel=${encodeURIComponent(mapel)}&kelas=${encodeURIComponent(kelas)}&kelasDasar=${encodeURIComponent(kelas)}&tab=${encodeURIComponent(mapel+"-"+kelas)}&guru=${encodeURIComponent(GURU_AKTIF)}&_t=${Date.now()}`;
+    let res = await fetch(reqUrl, { signal });
+    let data = await res.json();
+
+    if(document.getElementById("mapel").value !== mapel || document.getElementById("kelas").value !== kelas) return;
+
+    if(data.error){
+      alert(data.error);
+      document.getElementById("cekBank").innerHTML = `<span style="color:#dc2626">${data.error}</span>`;
+      return;
+    }
+
+    if(data.mapel && norm(data.mapel) !== norm(mapel)){
+      alert(`Peringatan: Server mengirim mapel "${data.mapel}", padahal Anda memilih "${mapel}". Dibatalkan agar tidak tercampur!`);
+      document.getElementById("cekBank").innerHTML = `<span style="color:#dc2626">Gagal: Mapel dari server (${data.mapel}) tidak cocok dengan pilihan (${mapel}).</span>`;
+      return;
+    }
+
+    let daftarSoal = Array.isArray(data.soal) ? data.soal : [];
+    daftarSoal = daftarSoal.filter(s => {
+      if(s.mapel && norm(s.mapel) !== norm(mapel)) return false;
+      if(s.kelas && String(s.kelas).trim() !== "" && getTingkatKelas(s.kelas) !== kelas) return false;
+      return s.soal && String(s.soal).trim() !== "";
+    });
+
+    if(!daftarSoal.length){
+      alert(`Soal kosong untuk ${mapel} Kelas ${kelas}! Cek Tab "${mapel}-${kelas}" di file Bank Soal.`);
+      document.getElementById("cekBank").innerHTML = `<span style="color:#dc2626">Soal kosong untuk ${mapel} Kelas ${kelas}.</span>`;
+      return;
+    }
+
+    document.getElementById("bank").value = daftarSoal.map(s => [
+      s.no || "",
+      String(s.soal || "").replace(/[\r\n\t]+/g, " "),
+      String(s.a || "").replace(/[\r\n\t]+/g, " "),
+      String(s.b || "").replace(/[\r\n\t]+/g, " "),
+      String(s.c || "").replace(/[\r\n\t]+/g, " "),
+      String(s.d || "").replace(/[\r\n\t]+/g, " "),
+      s.kunci || "A",
+      s.tipe || "",
+      String(s.pembahasan || "").replace(/[\r\n\t]+/g, " "),
+      s.gambar || "",
+      `${mapel}|${kelas}`
+    ].join("\t")).join("\n");
+
+    LAST_AMBIL = `${mapel}|${kelas}`;
+    btnBuat.disabled = false;
+    document.getElementById("cekBank").innerHTML = `<span style="color:#15803d;font-weight:700">Berhasil ambil ${daftarSoal.length} soal</span> &bull; Mapel: <b>${mapel}</b> &bull; Kelas: <b>${kelas}</b>. Silakan klik BUAT FILE UJIAN.`;
+  } catch(e) {
+    if(e.name === "AbortError") return;
+    document.getElementById("cekBank").innerHTML = `<span style="color:#dc2626">Gagal ambil Bank Soal: ${e.message || e}</span>`;
+  } finally {
+    btnAmbil.disabled = false;
+    FETCH_CONTROLLER = null;
+  }
+}
+
+function buat(){
+  let guru = document.getElementById("guru").value.trim();
+  let kepala = document.getElementById("kepala").value.trim();
+  let mapel = document.getElementById("mapel").value.trim();
+  let kelas = document.getElementById("kelas").value.trim();
+  let tahun = document.getElementById("tahun").value.trim();
+  let url = document.getElementById("url").value.trim();
+  let kkm = document.getElementById("kkm").value || 70;
+
+  if(!guru || !kepala || !url){ alert("Isi dulu: Nama Guru, Kepala, dan URL Script!"); return; }
+  if(LAST_AMBIL !== `${mapel}|${kelas}`){
+    alert(`Soal belum diambil untuk Mapel ${mapel} Kelas ${kelas}! Klik AMBIL BANK SOAL DARI SHEET dulu.`);
+    resetBank("Belum ambil baru");
+    return;
+  }
+
+  const cfg = GURU[GURU_AKTIF];
+  if(!cfg.mapelMTs.includes(mapel) || !cfg.kelasAllowed.includes(kelas)){
+    alert("Anda tidak memiliki akses untuk mapel/kelas ini.");
+    return;
+  }
+
+  let rawSoal = [];
+  let raw = document.getElementById("bank").value.trim();
+  if(raw){
+    raw.split("\n").filter(Boolean).forEach(line => {
+      const p = line.split("\t");
+      if(p.length < 6) return;
+      if(p[10] && p[10].trim() !== `${mapel}|${kelas}`) return;
+
+      let kh = (p[6] || "A").trim().toUpperCase();
+      let ki = ["A","B","C","D"].indexOf(kh);
+      if(ki < 0) ki = 0;
+      rawSoal.push({
+        q: p[1],
+        o: [p[2], p[3], p[4], p[5]],
+        k: ki,
+        gambar: fixGambar(p[9] || "")
+      });
+    });
+  }
+
+  if(!rawSoal.length){
+    alert("Bank Soal kosong atau tidak sesuai dengan Mapel & Kelas terpilih! Klik AMBIL BANK SOAL ulang.");
+    resetBank("Data tidak cocok");
+    return;
+  }
+
+  let totalBank = rawSoal.length;
+  for(let i = rawSoal.length - 1; i > 0; i--){
+    let j = Math.floor(Math.random() * (i + 1));
+    [rawSoal[i], rawSoal[j]] = [rawSoal[j], rawSoal[i]];
+  }
+  let soalArr = rawSoal.slice(0, 50);
+
+  document.getElementById("cekBank").innerHTML = `Total di Bank (${mapel} Kls ${kelas}): <b>${totalBank} soal</b> &bull; Diambil acak: <b>${soalArr.length} soal</b> &bull; Ada gambar: <b>${soalArr.filter(s=>s.gambar).length} soal</b>`;
+  let sekolah = "MTs Nurul Yaqin";
+  let kelasSiswaFiltered = KELAS_SISWA.filter(ks => getTingkatKelas(ks) === kelas);
+  let kelasOpt = kelasSiswaFiltered.map(k => `<option value="${k}">Kelas ${k}</option>`).join("");
+  let soalJson = JSON.stringify(soalArr).replace(/<\/script>/gi, "<\\/script>");
+
+  let html = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>UAS ${mapel} Kelas ${kelas} MTs</title><style>*{box-sizing:border-box;font-family:Arial,sans-serif}body{margin:0;background:#f0f2f5;padding:12px}.box{max-width:760px;margin:auto;background:#fff;border-radius:14px;overflow:hidden}.top{background:#0b6e4f;color:#fff;text-align:center;padding:16px}.kop{display:flex;align-items:center;gap:10px;padding:12px}.kop img{width:70px;height:70px;object-fit:contain}.kop>div{flex:1;text-align:center}.kop .t{font-weight:900;font-size:16px}.body{padding:16px}label{display:block;font-weight:800;margin-top:12px}input,select{width:100%;padding:11px;border:1.5px solid #d1d5db;border-radius:10px;margin-top:5px}.soal{border:1px solid #ddd;border-radius:10px;padding:12px;margin-top:12px}.soal img{max-width:100%;border-radius:10px;margin:8px 0}.opt{display:flex;gap:8px;margin:8px 0;background:#fff;border:1px solid #ddd;padding:11px;border-radius:10px;cursor:pointer}.opt input{width:18px;height:18px}.btn{width:100%;background:#15803d;color:#fff;border:0;padding:15px;font-size:16px;font-weight:800;border-radius:12px;cursor:pointer;margin-top:16px}.info{background:#f0fdf4;border:1px solid #bbf7d0;padding:12px;border-radius:10px;font-size:13px;line-height:1.6}.footer{margin-top:20px;border-top:1px dashed #ccc;padding-top:12px;display:flex;justify-content:space-between;text-align:center;font-size:12.5px}.footer b{display:block;margin-top:40px}.nav-box{position:sticky;top:8px;z-index:20;background:#fff;border:2px solid #0b6e4f;border-radius:14px;padding:12px;margin:14px 0}.nav-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.nav-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.nav-btn{width:38px;height:38px;border:1.5px solid #d1d5db;background:#f8fafc;border-radius:9px;font-weight:800;font-size:13px;cursor:pointer}.nav-btn.sudah{background:#dcfce7;border-color:#16a34a;color:#166534}.nav-btn.belum{background:#fff}.nav-btn.aktif{background:#0b6e4f;color:#fff;border-color:#0b6e4f;transform:scale(1.08)}.nav-btn.ragu{background:#fef08a;border-color:#eab308}.progress{height:10px;background:#e5e7eb;border-radius:20px;overflow:hidden;margin-top:10px}.progress div{height:100%;background:#16a34a}.nav-ctrl{display:flex;gap:8px;margin-top:12px}.nav-ctrl button{flex:1;padding:12px;border:0;border-radius:10px;font-weight:800;cursor:pointer}.btn-prev{background:#e5e7eb}.btn-next{background:#0b6e4f;color:#fff}.btn-ragu{background:#facc15}.legend{font-size:11px;color:#666;margin-top:8px}</style></head><body><div class="box"><div class="top"><h1>UJIAN AKHIR SEMESTER GAZAL</h1><h2>TAHUN PELAJARAN ${tahun} &nbsp; ${sekolah}</h2><p>Mapel: ${mapel} &nbsp; Kelas: ${kelas} &nbsp; Guru: ${guru} &nbsp; KKM: ${kkm}</p></div><div class="kop"><img src="${LOGO.kemenag}"><div><div class="t">YAYASAN PENDIDIKAN <span>NURUL YAQIN</span></div><div style="font-size:12px;font-weight:800;color:#0b6e4f;letter-spacing:1px">UJIAN AKHIR SEMESTER GAZAL (UAS) MTs &nbsp; ${tahun}</div><div style="font-size:11px;color:#666">Jl. Merdeka Km. 55 Tanjung Batu Ogan Ilir Sumatera Selatan 30664</div></div><img src="${LOGO.sekolah}"></div><div class="body"><div class="info"><b>Petunjuk:</b> Isi Nama, Kelas, No Ujian. Jawab 1 soal di layar, pakai Nomor / Sebelumnya / Berikutnya untuk pindah. Hijau = sudah dijawab, Putih = belum, Kuning = ragu-ragu.</div><label>Nama Lengkap *</label><input id="nama" placeholder="Contoh: Ahmad Fauzi"><label>Kelas *</label><select id="kelasSiswa">${kelasOpt}</select><label>No Ujian / NIS *</label><input id="noUjian" placeholder="Contoh: 15"><div id="timer" style="position:sticky;top:8px;z-index:10;background:#dc2626;color:#fff;text-align:center;padding:12px;font-weight:800;border-radius:10px;margin:16px 0">Sisa Waktu: 60:00</div><div class="nav-box"><div class="nav-top"><b>Navigasi Soal</b><span id="progressText" style="font-size:13px;font-weight:700">0 / ${soalArr.length} dijawab</span></div><div class="progress"><div id="progressBar" style="width:0%"></div></div><div class="nav-grid" id="navGrid"></div><div class="legend">Hijau = Sudah Dijawab &nbsp; Putih = Belum &nbsp; Kuning = Ragu-ragu &nbsp; Hijau Tua = Soal Aktif</div></div><div id="soalBox"></div><div class="nav-ctrl"><button class="btn-prev" onclick="prevSoal()">Sebelumnya</button><button class="btn-ragu" onclick="tandaiRagu()">Ragu-ragu</button><button class="btn-next" onclick="nextSoal()">Berikutnya</button></div><button class="btn" id="btnKirim" onclick="kirim()">KIRIM JAWABAN & LIHAT NILAI</button><div id="hasil" style="display:none;margin-top:16px;background:#ecfdf5;border:2px solid #10b981;border-radius:12px;padding:16px;text-align:center"></div><div class="footer"><div>Tanjung Batu, November 2026<br>Guru Mata Pelajaran<br><b>${guru}</b></div><div>Kepala Madrasah<br><br><b>${kepala}</b></div></div></div></div><script>const SOAL=${soalJson};const META={mapel:"${mapel}",kelas:"${kelas}",guru:"${guru}",kepala:"${kepala}",kkm:${kkm},url:"${url}",sekolah:"${sekolah}"};let current=0;let ragu=new Set();let JAWABAN=new Array(SOAL.length).fill(-1);let sisa=60*60;let timerInt=setInterval(()=>{sisa--;let m=Math.floor(sisa/60),d=sisa%60;let el=document.getElementById('timer');if(el)el.innerText='Sisa Waktu: '+m+':'+(d<10?'0':'')+d;if(sisa<=0){clearInterval(timerInt);kirim(true);}},1000);function buildNav(){document.getElementById('navGrid').innerHTML=SOAL.map((s,i)=>'<button class="nav-btn" id="nav'+i+'" onclick="goSoal('+i+')">'+(i+1)+'</button>').join('');}function pilihJawaban(idx,val){JAWABAN[idx]=val;updateNav();}function updateNav(){let dijawab=0;SOAL.forEach((s,i)=>{let btn=document.getElementById('nav'+i);if(!btn)return;btn.classList.remove('sudah','belum','aktif','ragu');if(i===current)btn.classList.add('aktif');else if(ragu.has(i))btn.classList.add('ragu');else if(JAWABAN[i]>=0)btn.classList.add('sudah');else btn.classList.add('belum');if(JAWABAN[i]>=0)dijawab++;});document.getElementById('progressText').innerText=dijawab+' / '+SOAL.length+' dijawab';document.getElementById('progressBar').style.width=(dijawab/SOAL.length*100)+'%';}function renderSoal(){let s=SOAL[current];let h='<div class="soal"><b>'+(current+1)+'. '+s.q+'</b> <span style="font-size:12px;color:#666">(Soal '+(current+1)+' dari '+SOAL.length+')</span><br>';if(s.gambar)h+='<img src="'+s.gambar+'">';s.o.forEach((o,j)=>{let chk=JAWABAN[current]===j?'checked':'';h+='<label class="opt"><input type="radio" name="q'+current+'" value="'+j+'" '+chk+' onchange="pilihJawaban('+current+','+j+')"> '+String.fromCharCode(65+j)+'. '+o+'</label>';});h+='</div>';document.getElementById('soalBox').innerHTML=h;updateNav();}function goSoal(i){current=i;renderSoal();}function nextSoal(){if(current<SOAL.length-1){current++;renderSoal();}}function prevSoal(){if(current>0){current--;renderSoal();}}function tandaiRagu(){if(ragu.has(current))ragu.delete(current);else ragu.add(current);updateNav();}buildNav();renderSoal();async function kirim(auto){let nama=document.getElementById('nama').value.trim()||(auto?'Siswa Tanpa Nama':'');let kelasS=document.getElementById('kelasSiswa').value;let noU=document.getElementById('noUjian').value.trim()||(auto?'-':'');if(!auto&&(!nama||!noU)){alert('Isi Nama dan No Ujian dulu!');return;}document.getElementById('btnKirim').disabled=true;let benar=0;SOAL.forEach((s,i)=>{if(JAWABAN[i]===s.k)benar++;});let nilai=Math.round(benar/SOAL.length*100);let h=document.getElementById('hasil');h.style.display='block';h.innerHTML='<h2>Nilai Kamu: '+nilai+'</h2><p>Benar '+benar+' dari '+SOAL.length+' soal &nbsp; '+(nilai>=META.kkm?'LULUS':'BELUM LULUS')+' &nbsp; KKM '+META.kkm+'</p><p>Nama: '+nama+' | Kelas: '+kelasS+' | Mapel: '+META.mapel+'</p><p>Mengirim ke Google Sheet...</p>';try{await fetch(META.url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({nama:nama,kelas:kelasS,nis:noU,mapel:META.mapel,nilai:nilai,benar:benar,jawaban:JAWABAN.map(v=>v<0?'-':String.fromCharCode(65+v)).join(','),waktu:new Date().toLocaleString('id-ID'),ujian:META.mapel+' Kelas '+META.kelas,guru:META.guru})});h.innerHTML+='<p style="color:green"><b>Nilai Berhasil Terkirim ke '+META.guru+'</b><br>Silakan screenshot nilai ini.</p>';}catch(e){h.innerHTML+='<p style="color:red">Gagal kirim otomatis. Screenshot nilai ini dan kirim ke WA Guru.</p>';}clearInterval(timerInt);window.scrollTo({top:0,behavior:'smooth'});}<\/script></body></html>`;
+
+  let blob = new Blob([html], { type: "text/html" });
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `UAS-GAZAL-MTs-${mapel}-Kelas-${kelas}-BERWARNA.html`;
+  a.click();
+  document.getElementById("hasil").style.display = "block";
+  document.getElementById("hasil").innerHTML = `<div class="info" style="margin-top:12px"><b>File Ujian Berhasil Dibuat!</b><br>Mapel: ${mapel} &bull; Kelas Guru: ${kelas} (Siswa: ${kelasSiswaFiltered.join(", ")}) &bull; Diambil Acak: ${soalArr.length} soal (dari ${totalBank} bank soal)<br>File <b>${a.download}</b> sudah ter-download.</div>`;
+}
+
+/* ==================== REKAP NILAI & EXPORT KOP ==================== */
+function normalizeRekapItem(raw){
+  // Ekstrak nama mapel jika dari kolom 'ujian' (contoh: "BTQ Kelas 8")
+  let mapelVal = raw.mapel || raw.mataPelajaran || "";
+  if(!mapelVal && raw.ujian){
+    mapelVal = String(raw.ujian).replace(/\s*Kelas\s*[0-9.]+/i, "").trim();
+  }
+  return {
+    nis: String(raw.nis || raw.noUjian || raw.no || "-").trim(),
+    nama: String(raw.nama || raw.namaSiswa || "-").trim(),
+    kelas: String(raw.kelas || raw.kelasSiswa || "-").trim(),
+    mapel: String(mapelVal || "-").trim(),
+    benar: raw.benar !== undefined ? raw.benar : "-",
+    nilai: Number(raw.nilai || raw.skor || 0),
+    waktu: String(raw.waktu || raw.timestamp || "-").trim(),
+    guru: String(raw.guru || "").trim()
+  };
+}
+
+async function muatRekapNilai(){
+  const btn = document.getElementById("btnMuatRekap");
+  const status = document.getElementById("statusRekap");
+  const mapelPilihan = document.getElementById("rMapel").value;
+  btn.disabled = true;
+  status.innerHTML = `Sedang mengambil rekap nilai <b>${mapelPilihan}</b> dari server...`;
+
+  let dariServer = [];
+  try{
+    const reqUrl = `${BANK_SOAL_URL}?action=rekap&rekap=1&mode=nilai&mapel=${encodeURIComponent(mapelPilihan)}&guru=${encodeURIComponent(GURU_AKTIF)}&_t=${Date.now()}`;
+    const res = await fetch(reqUrl);
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : (data.nilai || data.rekap || data.data || data.hasil || []);
+    if(Array.isArray(list)){
+      dariServer = list.map(normalizeRekapItem);
+    }
+  }catch(_){
+    // Fallback otomatis ke data cadangan jika endpoint GET belum mengembalikan array nilai
+  }
+
+  let dariLokal = [];
+  try{
+    dariLokal = JSON.parse(localStorage.getItem("MTs_NY_REKAP_NILAI") || "[]").map(normalizeRekapItem);
+  }catch(_){}
+
+  // Gabungkan & hilangkan duplikat berdasarkan NIS + Nama + Mapel + Waktu
+  const gabungan = [...dariServer, ...dariLokal];
+  const unikMap = new Map();
+  gabungan.forEach(item => {
+    const key = `${norm(item.nis)}|${norm(item.nama)}|${norm(item.mapel)}|${item.nilai}`;
+    if(!unikMap.has(key) && item.nama !== "-") unikMap.set(key, item);
+  });
+
+  DATA_REKAP_RAW = Array.from(unikMap.values());
+  btn.disabled = false;
+  status.innerHTML = `Data diperbarui (${new Date().toLocaleTimeString("id-ID")}). Menampilkan nilai khusus mapel &amp; kelas ampuan Anda.`;
+  renderTabelRekap();
+}
+
+function getFilteredRekap(){
+  const cfg = GURU[GURU_AKTIF];
+  const mapelSel = document.getElementById("rMapel").value;
+  const kelasSel = document.getElementById("rKelasSiswa").value;
+
+  return DATA_REKAP_RAW.filter(row => {
+    // 1. Pastikan mapel cocok dengan pilihan & hak akses guru
+    if(norm(row.mapel) !== norm(mapelSel)) return false;
+    if(!cfg.mapelMTs.some(m => norm(m) === norm(row.mapel))) return false;
+
+    // 2. Pastikan tingkat kelas siswa masuk dalam kelasAllowed guru
+    const tingkat = getTingkatKelas(row.kelas);
+    if(!cfg.kelasAllowed.includes(tingkat)) return false;
+
+    // 3. Filter dropdown kelas spesifik siswa (7.1, 7.2, dst)
+    if(kelasSel !== "ALL" && row.kelas !== kelasSel) return false;
+
+    return true;
+  });
+}
+
+function renderTabelRekap(){
+  const rows = getFilteredRekap();
+  const kkm = Number(document.getElementById("rKkm").value || 70);
+  const tbody = document.getElementById("tbodyRekap");
+
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#64748b;padding:18px">Belum ada data nilai siswa untuk filter mapel &amp; kelas ini.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map((r, idx) => {
+    const lulus = r.nilai >= kkm;
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td>${r.nis}</td>
+        <td><b>${r.nama}</b></td>
+        <td>${r.kelas}</td>
+        <td>${r.mapel}</td>
+        <td>${r.benar}</td>
+        <td><b>${r.nilai}</b></td>
+        <td><span class="${lulus ? "badge-lulus" : "badge-remidi"}">${lulus ? "LULUS" : "REMIDI"}</span></td>
+        <td style="font-size:11.5px;color:#475569">${r.waktu}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function buildKopDokumenHTML(rows, mapel, kelasLabel, kkm){
+  const kepala = document.getElementById("kepala") ? document.getElementById("kepala").value.trim() : "Dr. Istifada Rosyad, MM";
+  const tahun = document.getElementById("tahun") ? document.getElementById("tahun").value.trim() : "2026 / 2027";
+  const tglCetak = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+
+  const tableRows = rows.length ? rows.map((r, i) => `
+    <tr>
+      <td style="text-align:center">${i + 1}</td>
+      <td style="text-align:center">${r.nis}</td>
+      <td>${r.nama}</td>
+      <td style="text-align:center">${r.kelas}</td>
+      <td style="text-align:center">${r.benar}</td>
+      <td style="text-align:center;font-weight:bold">${r.nilai}</td>
+      <td style="text-align:center">${r.nilai >= kkm ? "LULUS" : "BELUM LULUS"}</td>
+    </tr>
+  `).join("") : `<tr><td colspan="7" style="text-align:center;padding:14px">Belum ada data nilai siswa.</td></tr>`;
+
+  return `
+  <!DOCTYPE html>
+  <html lang="id">
+  <head>
+    <meta charset="UTF-8">
+    <title>Rekap Nilai UAS - ${mapel} - MTs Nurul Yaqin</title>
+    <style>
+      body{font-family:"Times New Roman",Times,serif;margin:20px 30px;color:#000}
+      .kop-table{width:100%;border-collapse:collapse}
+      .kop-table td{vertical-align:middle}
+      .kop-logo{width:88px;text-align:center}
+      .kop-logo img{width:82px;height:82px;object-fit:contain}
+      .kop-text{text-align:center;line-height:1.25}
+      .kop-text .k1{font-size:15pt;font-weight:bold}
+      .kop-text .k2{font-size:16pt;font-weight:bold}
+      .kop-text .k3{font-size:15pt;font-weight:bold}
+      .kop-text .k4{font-size:14pt;font-weight:bold}
+      .kop-text .k5{font-size:9.5pt;margin-top:3px}
+      .kop-meta{display:flex;justify-content:space-between;font-weight:bold;font-size:10.5pt;margin-top:6px;padding:0 4px}
+      .garis-ganda{border-top:3px solid #000;border-bottom:1px solid #000;height:2px;margin:4px 0 16px}
+      .judul{text-align:center;margin-bottom:14px}
+      .judul h3{margin:0;font-size:13pt;text-decoration:underline}
+      .judul p{margin:4px 0 0;font-size:11pt;font-weight:bold}
+      .info-mapel{width:100%;margin-bottom:12px;font-size:11pt}
+      .info-mapel td{padding:2px 4px}
+      table.nilai{width:100%;border-collapse:collapse;font-size:11pt}
+      table.nilai th, table.nilai td{border:1px solid #000;padding:6px 8px}
+      table.nilai th{background:#f0f0f0;text-align:center;font-weight:bold}
+      .ttd-table{width:100%;margin-top:28px;font-size:11pt}
+      .ttd-table td{width:50%;text-align:center;vertical-align:top}
+      @media print{
+        @page{size:A4 portrait;margin:12mm 15mm}
+        .no-print{display:none}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="no-print" style="background:#fef3c7;border:1px solid #f59e0b;padding:10px;margin-bottom:14px;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;display:flex;justify-content:space-between;align-items:center">
+      <span>Pratinjau Dokumen Rekap Nilai Siap Cetak / Simpan sebagai PDF.</span>
+      <button onclick="window.print()" style="background:#0b6e4f;color:#fff;border:0;padding:8px 16px;border-radius:6px;font-weight:bold;cursor:pointer">CETAK / SIMPAN PDF</button>
+    </div>
+
+    <!-- KOP SURAT RESMI SESUAI GAMBAR -->
+    <table class="kop-table">
+      <tr>
+        <td class="kop-logo"><img src="${LOGO.sekolah}" alt="Logo MTs Nurul Yaqin"></td>
+        <td class="kop-text">
+          <div class="k1">KEMENTERIAN AGAMA</div>
+          <div class="k2">PONDOK PESANTREN NURUL YAQIN TANJUNG ATAP</div>
+          <div class="k3">MADRASAH TSANAWIYAH (MTs)</div>
+          <div class="k4">AKREDITASI B</div>
+          <div class="k5">Alamat : Jl Merdeka Km. 55 Kelurahan Tanjung Batu Timur Kecamatan Tanjung Batu<br>Kabupaten Ogan Ilir Kode Pos 30664 Telp. (0712) 360196</div>
+        </td>
+      </tr>
+    </table>
+    <div class="kop-meta">
+      <span>NSM &nbsp;&nbsp;&nbsp;: 121216100003</span>
+      <span>NPSN : 10648763</span>
+    </div>
+    <div class="garis-ganda"></div>
+
+    <div class="judul">
+      <h3>REKAPITULASI NILAI UJIAN AKHIR SEMESTER (UAS) GAZAL</h3>
+      <p>TAHUN PELAJARAN ${tahun}</p>
+    </div>
+
+    <table class="info-mapel">
+      <tr>
+        <td style="width:160px"><b>Mata Pelajaran</b></td>
+        <td style="width:240px">: ${mapel}</td>
+        <td style="width:140px"><b>KKM</b></td>
+        <td>: ${kkm}</td>
+      </tr>
+      <tr>
+        <td><b>Kelas</b></td>
+        <td>: ${kelasLabel}</td>
+        <td><b>Jumlah Peserta</b></td>
+        <td>: ${rows.length} Siswa</td>
+      </tr>
+      <tr>
+        <td><b>Guru Pengampu</b></td>
+        <td colspan="3">: ${GURU_AKTIF}</td>
+      </tr>
+    </table>
+
+    <table class="nilai">
+      <thead>
+        <tr>
+          <th style="width:36px">No</th>
+          <th style="width:95px">NIS / No Ujian</th>
+          <th>Nama Lengkap Siswa</th>
+          <th style="width:70px">Kelas</th>
+          <th style="width:65px">Benar</th>
+          <th style="width:65px">Nilai</th>
+          <th style="width:110px">Keterangan</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRows}
+      </tbody>
+    </table>
+
+    <table class="ttd-table">
+      <tr>
+        <td>
+          Mengetahui,<br>
+          Kepala Madrasah Tsanawiyah<br><br><br><br>
+          <u><b>${kepala}</b></u>
+        </td>
+        <td>
+          Tanjung Batu, ${tglCetak}<br>
+          Guru Mata Pelajaran,<br><br><br><br>
+          <u><b>${GURU_AKTIF}</b></u>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>`;
+}
+
+function exportPrintKop(){
+  const rows = getFilteredRekap();
+  const mapel = document.getElementById("rMapel").value;
+  const kelasVal = document.getElementById("rKelasSiswa").value;
+  const kelasLabel = kelasVal === "ALL" ? `Kelas ${GURU[GURU_AKTIF].kelasAllowed.join(" & ")}` : `Kelas ${kelasVal}`;
+  const kkm = Number(document.getElementById("rKkm").value || 70);
+
+  const docHtml = buildKopDokumenHTML(rows, mapel, kelasLabel, kkm);
+  const win = window.open("", "_blank");
+  if(!win){
+    alert("Pop-up diblokir browser. Izinkan pop-up untuk mencetak laporan.");
+    return;
+  }
+  win.document.open();
+  win.document.write(docHtml);
+  win.document.close();
+  setTimeout(() => { win.focus(); win.print(); }, 600);
+}
+
+function exportExcelKop(){
+  const rows = getFilteredRekap();
+  const mapel = document.getElementById("rMapel").value;
+  const kelasVal = document.getElementById("rKelasSiswa").value;
+  const kelasLabel = kelasVal === "ALL" ? `Kelas ${GURU[GURU_AKTIF].kelasAllowed.join("-")}` : `Kelas ${kelasVal}`;
+  const kkm = Number(document.getElementById("rKkm").value || 70);
+
+  const docHtml = buildKopDokumenHTML(rows, mapel, kelasLabel, kkm);
+  const blob = new Blob(["\ufeff", docHtml], { type: "application/vnd.ms-excel" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `Rekap-Nilai-UAS-${mapel}-${kelasLabel}-MTs-Nurul-Yaqin.xls`;
+  a.click();
+}
+
+// Jalankan default saat halaman dibuka: Mode Siswa aktif
+switchMode("siswa");
+</script>
+</body>
+</html>
